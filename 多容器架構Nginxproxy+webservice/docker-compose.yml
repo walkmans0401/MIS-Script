@@ -1,0 +1,88 @@
+version: '3'
+services:
+  db:
+    container_name: db
+    image: mariadb:latest
+    ports:
+        - '3306:3306'
+    restart: unless-stopped
+    volumes:
+        - ./db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_DATABASE2: ${MYSQL_DATABASE2}
+      MYSQL_DATABASE3: ${MYSQL_DATABASE3}
+
+  wp1:
+    depends_on:
+      - db
+    container_name: XXX-1.com.tw
+    image: wordpress:5.4.2-php7.4
+    restart: unless-stopped
+    volumes:
+      - ./sites/xxx-1.com.tw/wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: XXX-1_wp
+      WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_DEBUG: 0
+      VIRTUAL_HOST: XXX-1.com.tw
+      LETSENCRYPT_HOST: XXX-1.com.tw
+      LETSENCRYPT_EMAIL: myemail@email.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+     wp2:
+    depends_on:
+      - db
+    container_name: XXX-2.com.tw
+    image: wordpress:5.4.2-php7.4
+    restart: unless-stopped
+    volumes:
+      - ./sites/xxx-2.com.tw/wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: XXX-2_wp
+      WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_DEBUG: 0
+      VIRTUAL_HOST: XXX-2.com.tw
+      LETSENCRYPT_HOST: XXX-2.com.tw
+      LETSENCRYPT_EMAIL: myemail@email.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    
+    wp3:
+    depends_on:
+      - db
+    # - redis
+    container_name: XXX-3.com.tw
+    image: wordpress:5.4.2-php7.4
+    restart: unless-stopped
+    volumes:
+      - ./sites/xxx-3/wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: XXX-3_wp
+      WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_DEBUG: 0
+      VIRTUAL_HOST: XXX-3.com.tw
+      LETSENCRYPT_HOST: XXX-3.com.tw
+      LETSENCRYPT_EMAIL: myemail@email.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+networks:
+    default:
+      external:
+        name: wp-proxy
+
